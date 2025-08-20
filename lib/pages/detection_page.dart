@@ -1,6 +1,10 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DetectionPage extends StatefulWidget {
   @override
@@ -62,18 +66,36 @@ class _DetectionPageState extends State<DetectionPage>
       isAnalyzing = true;
     });
 
-    // Simulate analysis time
-    await Future.delayed(Duration(seconds: 3));
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://10.0.2.2:5000/predict'), // <-- Replace with backend IP
+        // Uri.parse('http://172.29.164.147:5000/predict'),
+      );
+      request.files
+          .add(await http.MultipartFile.fromPath('image', selectedImage!.path));
+
+      var response = await request.send();
+      var respStr = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        var data = json.decode(respStr);
+        String predictedClass = data['predicted_class'];
+        double confidence = data['confidence'];
+        _showAnalysisResult(predictedClass, confidence);
+      } else {
+        _showAnalysisResult("Error", 0);
+      }
+    } catch (e) {
+      _showAnalysisResult("Error: $e", 0);
+    }
 
     setState(() {
       isAnalyzing = false;
     });
-
-    // Show analysis result
-    _showAnalysisResult();
   }
 
-  void _showAnalysisResult() {
+  void _showAnalysisResult(String predictedClass, double confidence) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -89,7 +111,9 @@ class _DetectionPageState extends State<DetectionPage>
             ],
           ),
           content: Text(
-            'Analysis complete! This is a placeholder for AI model integration.',
+            predictedClass.startsWith("Error")
+                ? predictedClass
+                : 'Prediction: $predictedClass\nConfidence: ${confidence.toStringAsFixed(2)}%',
           ),
           actions: [
             TextButton(
@@ -119,7 +143,6 @@ class _DetectionPageState extends State<DetectionPage>
         ),
         child: Stack(
           children: [
-            // Glassmorphism background elements
             Positioned(
               top: 80,
               right: 40,
@@ -171,7 +194,6 @@ class _DetectionPageState extends State<DetectionPage>
                 ),
               ),
             ),
-            // Main content
             SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(16),
@@ -295,7 +317,6 @@ class _DetectionPageState extends State<DetectionPage>
                   border: Border.all(
                     color: Colors.grey[300]!,
                     width: 2,
-                    style: BorderStyle.solid,
                   ),
                   borderRadius: BorderRadius.circular(12),
                   color: Colors.white.withOpacity(0.2),
@@ -455,9 +476,8 @@ class _DetectionPageState extends State<DetectionPage>
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(Colors.white),
                                 ),
                               )
                             : Icon(Icons.flash_on, color: Colors.white),
