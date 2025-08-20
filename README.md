@@ -14,8 +14,9 @@ A **Flask API** serves the model predictions, and a **Flutter app** is used for 
 
 ### **1. Clone the Repository**
 ```bash
-git clone https://github.com/alluramya1616/eye_clip.git
-cd eye_clip
+git clone https://github.com/eluriNarsimhulu/Optim.git
+
+cd optim
 ```
 
 ---
@@ -66,7 +67,7 @@ http://0.0.0.0:5000/predict
 ### **5. Install Flutter Dependencies**
 In a new terminal:
 ```bash
-cd flutter_app_directory (eye_clip) # go into your Flutter folder
+cd flutter_app_directory (optim) # go into your Flutter folder
 flutter pub get
 ```
 
