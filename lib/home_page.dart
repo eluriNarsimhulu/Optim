@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth_page.dart';
+// import '../home_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -162,10 +163,30 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with logout button
+                // Header with back button and logout button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Back button
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: const LinearGradient(
+                            colors: [Colors.white24, Colors.white10],
+                          ),
+                          border: Border.all(color: Colors.white30, width: 1),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    // Title
                     const Text(
                       "My Profile",
                       style: TextStyle(
@@ -174,6 +195,7 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.white,
                       ),
                     ),
+                    // Logout button
                     GestureDetector(
                       onTap: _logout,
                       child: Container(
@@ -294,9 +316,9 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Welcome to Optim! 🎉",
-                        style: const TextStyle(
+                      const Text(
+                        "Welcome to Optim!",
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

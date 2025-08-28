@@ -1,6 +1,7 @@
 // login_page.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'pages/landing_page.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -37,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const HomePage()),
+          MaterialPageRoute(builder: (_) => const LandingPage()),
         );
       }
     } on FirebaseAuthException catch (e) {

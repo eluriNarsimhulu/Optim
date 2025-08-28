@@ -4,6 +4,8 @@ import 'login_page.dart';
 import 'signup_page.dart';
 import 'auth_page.dart';
 import 'home_page.dart';
+import 'utils/routes.dart';  
+import 'pages/landing_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -37,15 +39,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'SF Pro Display',
       ),
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return const HomePage();
-          }
-          return const AuthPage();
-        },
-      ),
+      routes: appRoutes,  
+      initialRoute: '/', // Use this instead of home
     );
   }
 }
