@@ -1,4 +1,4 @@
-// auth_page.dart
+//root/lib/auth_page.dart
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'signup_page.dart';

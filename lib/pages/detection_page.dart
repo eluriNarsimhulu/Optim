@@ -1,10 +1,12 @@
 
-
+//root/lib/pages/detection_page.dart
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class DetectionPage extends StatefulWidget {
   @override
@@ -70,8 +72,7 @@ class _DetectionPageState extends State<DetectionPage>
       var request = http.MultipartRequest(
         'POST',
         // Uri.parse('http://10.0.2.2:5000/predict'), // <-- Replace with backend IP
-        // Uri.parse('http://172.29.164.147:5000/predict'),
-        Uri.parse('http://10.255.37.147:5000/predict'),
+        Uri.parse('http://192.168.10.12:5000/classify_advanced'),
       );
       request.files
           .add(await http.MultipartFile.fromPath('image', selectedImage!.path));

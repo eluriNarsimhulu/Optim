@@ -1,9 +1,13 @@
-// signup_page.dart
+//root/lib/signup_page.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_page.dart';
+import 'pages/landing_page.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -99,6 +103,7 @@ class _SignupPageState extends State<SignupPage> {
         case 'email-already-in-use':
           message = "An account already exists with this email address.";
           break;
+          
         case 'invalid-email':
           message = "Invalid email address format.";
           break;
@@ -145,41 +150,102 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-  Future<void> _sendOTP() async {
+  // Future<void> _sendOTP() async {
+  //   String phoneNumber = _phoneController.text.trim();
+  //   setState(() => _isLoading = true);
+
+  //   try {
+  //     await _auth.verifyPhoneNumber(
+  //       phoneNumber: phoneNumber,
+  //       verificationCompleted: (PhoneAuthCredential credential) async {
+  //         // Auto-verification (Android only)
+  //         await _linkPhoneNumber(credential);
+  //       },
+  //       verificationFailed: (FirebaseAuthException e) {
+  //         setState(() => _isLoading = false);
+  //         _showSnackBar("Phone verification failed: ${e.message}", isError: true);
+  //       },
+  //       codeSent: (String verificationId, int? resendToken) {
+  //         setState(() {
+  //           _verificationId = verificationId;
+  //           _otpSent = true;
+  //           _isLoading = false;
+  //         });
+  //         _showSnackBar("OTP sent to your phone!", isError: false);
+  //         _startOTPResendCooldown();
+  //       },
+  //       codeAutoRetrievalTimeout: (String verificationId) {
+  //         _verificationId = verificationId;
+  //       },
+  //       timeout: const Duration(seconds: 60),
+  //     );
+  //   } catch (e) {
+  //     setState(() => _isLoading = false);
+  //     _showSnackBar("Failed to send OTP. Please try again.", isError: true);
+  //   }
+  // }
+    Future<void> _sendOTP() async {
     String phoneNumber = _phoneController.text.trim();
     setState(() => _isLoading = true);
 
     try {
-      await _auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto-verification (Android only)
-          await _linkPhoneNumber(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          setState(() => _isLoading = false);
-          _showSnackBar("Phone verification failed: ${e.message}", isError: true);
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          setState(() {
-            _verificationId = verificationId;
-            _otpSent = true;
-            _isLoading = false;
-          });
-          _showSnackBar("OTP sent to your phone!", isError: false);
-          _startOTPResendCooldown();
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          _verificationId = verificationId;
-        },
-        timeout: const Duration(seconds: 60),
+      final response = await http.post(
+        Uri.parse("http://10.56.163.147:3000/send-otp"), // Android emulator
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"phone": phoneNumber}),
       );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _otpSent = true;
+          _isLoading = false;
+        });
+        _showSnackBar("OTP sent to your phone!", isError: false);
+        _startOTPResendCooldown();
+      } else {
+        throw Exception(jsonDecode(response.body)["error"]);
+      }
     } catch (e) {
       setState(() => _isLoading = false);
-      _showSnackBar("Failed to send OTP. Please try again.", isError: true);
+      _showSnackBar("Failed to send OTP: $e", isError: true);
     }
   }
 
+
+  // Future<void> _verifyOTP() async {
+  //   if (_otpController.text.trim().length != 6) {
+  //     _showSnackBar("Please enter a valid 6-digit OTP", isError: true);
+  //     return;
+  //   }
+
+  //   setState(() => _isVerifyingOTP = true);
+
+  //   try {
+  //     PhoneAuthCredential credential = PhoneAuthProvider.credential(
+  //       verificationId: _verificationId!,
+  //       smsCode: _otpController.text.trim(),
+  //     );
+
+  //     await _linkPhoneNumber(credential);
+  //   } on FirebaseAuthException catch (e) {
+  //     setState(() => _isVerifyingOTP = false);
+  //     String message;
+  //     switch (e.code) {
+  //       case 'invalid-verification-code':
+  //         message = "Invalid OTP. Please check and try again.";
+  //         break;
+  //       case 'session-expired':
+  //         message = "OTP has expired. Please request a new one.";
+  //         break;
+  //       default:
+  //         message = "OTP verification failed: ${e.message}";
+  //     }
+  //     _showSnackBar(message, isError: true);
+  //   } catch (e) {
+  //     setState(() => _isVerifyingOTP = false);
+  //     _showSnackBar("An error occurred. Please try again.", isError: true);
+  //   }
+  // }
   Future<void> _verifyOTP() async {
     if (_otpController.text.trim().length != 6) {
       _showSnackBar("Please enter a valid 6-digit OTP", isError: true);
@@ -189,64 +255,74 @@ class _SignupPageState extends State<SignupPage> {
     setState(() => _isVerifyingOTP = true);
 
     try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: _verificationId!,
-        smsCode: _otpController.text.trim(),
+      final response = await http.post(
+        Uri.parse("http://10.56.163.147:3000/verify-otp"), // same as above
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "phone": _phoneController.text.trim(),
+          "code": _otpController.text.trim(),
+        }),
       );
 
-      await _linkPhoneNumber(credential);
-    } on FirebaseAuthException catch (e) {
-      setState(() => _isVerifyingOTP = false);
-      String message;
-      switch (e.code) {
-        case 'invalid-verification-code':
-          message = "Invalid OTP. Please check and try again.";
-          break;
-        case 'session-expired':
-          message = "OTP has expired. Please request a new one.";
-          break;
-        default:
-          message = "OTP verification failed: ${e.message}";
-      }
-      _showSnackBar(message, isError: true);
-    } catch (e) {
-      setState(() => _isVerifyingOTP = false);
-      _showSnackBar("An error occurred. Please try again.", isError: true);
-    }
-  }
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        if (result["status"] == "approved") {
+          await _saveUserToFirestore();
+          _showSnackBar("Phone verified successfully! Account created!", isError: false);
 
-  Future<void> _linkPhoneNumber(PhoneAuthCredential credential) async {
-    try {
-      // Link phone number to the existing account
-      await _auth.currentUser?.linkWithCredential(credential);
-
-      // Both email and phone are verified, save to Firestore
-      await _saveUserToFirestore();
-      
-      setState(() => _isVerifyingOTP = false);
-      
-      _showSnackBar("Phone verified successfully! Account created!", isError: false);
-      
-      // Navigate to home page
-      if (mounted) {
-        await Future.delayed(const Duration(milliseconds: 1500));
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomePage()),
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      setState(() => _isVerifyingOTP = false);
-      if (e.code == 'credential-already-in-use') {
-        _showSnackBar("This phone number is already in use by another account.", isError: true);
+          if (mounted) {
+            await Future.delayed(const Duration(milliseconds: 1500));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const LandingPage()),
+            );
+          }
+        } else {
+          _showSnackBar("Invalid OTP, please try again.", isError: true);
+        }
       } else {
-        _showSnackBar("Failed to link phone number: ${e.message}", isError: true);
+        throw Exception(jsonDecode(response.body)["error"]);
       }
     } catch (e) {
+      _showSnackBar("OTP verification failed: $e", isError: true);
+    } finally {
       setState(() => _isVerifyingOTP = false);
-      _showSnackBar("An error occurred while linking phone number.", isError: true);
     }
   }
+
+
+  // Future<void> _linkPhoneNumber(PhoneAuthCredential credential) async {
+  //   try {
+  //     // Link phone number to the existing account
+  //     await _auth.currentUser?.linkWithCredential(credential);
+
+  //     // Both email and phone are verified, save to Firestore
+  //     await _saveUserToFirestore();
+      
+  //     setState(() => _isVerifyingOTP = false);
+      
+  //     _showSnackBar("Phone verified successfully! Account created!", isError: false);
+      
+  //     // Navigate to home page
+  //     if (mounted) {
+  //       await Future.delayed(const Duration(milliseconds: 1500));
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (_) => const LandingPage()),
+  //       );
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     setState(() => _isVerifyingOTP = false);
+  //     if (e.code == 'credential-already-in-use') {
+  //       _showSnackBar("This phone number is already in use by another account.", isError: true);
+  //     } else {
+  //       _showSnackBar("Failed to link phone number: ${e.message}", isError: true);
+  //     }
+  //   } catch (e) {
+  //     setState(() => _isVerifyingOTP = false);
+  //     _showSnackBar("An error occurred while linking phone number.", isError: true);
+  //   }
+  // }
 
   Future<void> _saveUserToFirestore() async {
     try {

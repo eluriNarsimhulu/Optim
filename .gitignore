@@ -146,7 +146,7 @@ out/
 .vitepress/
 .vitepress/dist
 .vitepress/cache
-
+models/
 # Logs
 logs
 *.log
@@ -198,3 +198,7 @@ migrate_working_dir/
 .env
 .env.*
 !.env.example
+# Ignore node_modules inside otp-backend
+otp-backend/node_modules/
+
+*.zip
