@@ -1,8 +1,9 @@
-//root/lib/login_page.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/landing_page.dart';
 import 'home_page.dart';
+import 'services/google_auth_service.dart';
+import 'forgot_password_page.dart'; // Add this import
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,6 +14,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _auth = FirebaseAuth.instance;
+  final _googleAuthService = GoogleAuthService();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -66,6 +68,54 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       _showSnackBar(
         "An unexpected error occurred. Please try again.",
+        isError: true,
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final userCredential = await _googleAuthService.signInWithGoogle();
+      
+      if (userCredential == null) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      _showSnackBar("Welcome ${userCredential.user?.displayName ?? 'User'}!", isError: false);
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LandingPage()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          message = "An account already exists with this email using a different sign-in method.";
+          break;
+        case 'invalid-credential':
+          message = "Invalid credential. Please try again.";
+          break;
+        case 'operation-not-allowed':
+          message = "Google sign-in is not enabled.";
+          break;
+        case 'user-disabled':
+          message = "This user has been disabled.";
+          break;
+        default:
+          message = "Google sign-in failed: ${e.message}";
+      }
+      _showSnackBar(message, isError: true);
+    } catch (e) {
+      _showSnackBar(
+        "An error occurred during Google sign-in. Please try again.",
         isError: true,
       );
     } finally {
@@ -143,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               
-              const SizedBox(height: 40), // Controlled gap
+              const SizedBox(height: 40),
 
               // Centered form container
               Expanded(
@@ -199,7 +249,33 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 30),
+                            
+                            // Forgot Password Link - ADDED
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ForgotPasswordPage(),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Forgot Password?",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 10),
 
                             // Login button
                             SizedBox(
@@ -230,6 +306,75 @@ class _LoginPageState extends State<LoginPage> {
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // Divider with "OR"
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(
+                                    color: Colors.white.withOpacity(0.3),
+                                    thickness: 1,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text(
+                                    "OR",
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.7),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Divider(
+                                    color: Colors.white.withOpacity(0.3),
+                                    thickness: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // Google Sign-In Button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton.icon(
+                                onPressed: _isLoading ? null : _signInWithGoogle,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black87,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                icon: Image.asset(
+                                  'assets/google_logo.png',
+                                  height: 24,
+                                  width: 24,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.g_mobiledata,
+                                      size: 32,
+                                      color: Color(0xFF4285F4),
+                                    );
+                                  },
+                                ),
+                                label: const Text(
+                                  "Sign in with Google",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ),
                           ],

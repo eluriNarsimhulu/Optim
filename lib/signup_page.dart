@@ -190,7 +190,8 @@ class _SignupPageState extends State<SignupPage> {
 
     try {
       final response = await http.post(
-        Uri.parse("http://10.56.163.147:3000/send-otp"), // Android emulator
+        // Uri.parse("http://otp-backend-jp0m.onrender.com/send-otp"),
+        Uri.parse("http://10.14.47.147:3000/send-otp"), // Android emulator
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"phone": phoneNumber}),
       );
@@ -256,7 +257,8 @@ class _SignupPageState extends State<SignupPage> {
 
     try {
       final response = await http.post(
-        Uri.parse("http://10.56.163.147:3000/verify-otp"), // same as above
+        // Uri.parse("https://otp-backend-jp0m.onrender.com/verify-otp"), // same as above
+        Uri.parse("http://10.14.47.147:3000/verify-otp"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "phone": _phoneController.text.trim(),

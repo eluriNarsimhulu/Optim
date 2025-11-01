@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth_page.dart';
-// import '../home_page.dart';
+import 'services/google_auth_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,9 +15,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
+  final _googleAuthService = GoogleAuthService();
   String userName = '';
   String userEmail = '';
   String joinDate = '';
+  String? photoURL;
   bool _isLoading = true;
 
   @override
@@ -30,17 +32,19 @@ class _HomePageState extends State<HomePage> {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        // Set basic user info immediately
         setState(() {
           userEmail = user.email ?? '';
           userName = user.displayName ?? user.email?.split('@')[0] ?? 'User';
+          photoURL = user.photoURL;
         });
 
-        // Try to get additional info from Firestore with timeout
         try {
-          final doc = await _firestore.collection('users').doc(user.uid).get()
+          final doc = await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .get()
               .timeout(const Duration(seconds: 5));
-          
+
           if (doc.exists && doc.data() != null) {
             final data = doc.data()!;
             setState(() {
@@ -59,12 +63,11 @@ class _HomePageState extends State<HomePage> {
             });
           }
         } catch (e) {
-          // If Firestore fails, just set join date to recently
           setState(() {
             joinDate = "Recently";
           });
         }
-        
+
         setState(() {
           _isLoading = false;
         });
@@ -77,11 +80,11 @@ class _HomePageState extends State<HomePage> {
         });
       }
     } catch (e) {
-      // Handle any error and stop loading
       final user = _auth.currentUser;
       setState(() {
         userName = user?.displayName ?? user?.email?.split('@')[0] ?? 'User';
         userEmail = user?.email ?? '';
+        photoURL = user?.photoURL;
         joinDate = 'Recently';
         _isLoading = false;
       });
@@ -92,19 +95,28 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: Colors.white,
-        title: const Text('Logout'),
+        title: Row(
+          children: [
+            Icon(Icons.logout, color: Colors.red[400]),
+            const SizedBox(width: 8),
+            const Text('Logout'),
+          ],
+        ),
         content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
+            child: const Text('Cancel'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              await _auth.signOut();
+              
+              // Sign out from both Firebase and Google
+              await _googleAuthService.signOut();
+              
               if (mounted) {
                 Navigator.pushReplacement(
                   context,
@@ -112,7 +124,16 @@ class _HomePageState extends State<HomePage> {
                 );
               }
             },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[600],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Logout',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -129,15 +150,15 @@ class _HomePageState extends State<HomePage> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFF667eea),
-                Color(0xFF764ba2),
-                Color(0xFFf093fb),
+                Color(0xFFE8EAF6),
+                Colors.white,
+                Color(0xFFFFF3E0),
               ],
             ),
           ),
-          child: const Center(
+          child: Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple[600]!),
             ),
           ),
         ),
@@ -151,259 +172,405 @@ class _HomePageState extends State<HomePage> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF667eea),
-              Color(0xFF764ba2),
-              Color(0xFFf093fb),
+              Color(0xFFE8EAF6),
+              Colors.white,
+              Color(0xFFFFF3E0),
             ],
           ),
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with back button and logout button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
+          children: [
+            _buildBackgroundElements(),
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Back button
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          gradient: const LinearGradient(
-                            colors: [Colors.white24, Colors.white10],
-                          ),
-                          border: Border.all(color: Colors.white30, width: 1),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                          size: 24,
+                    _buildHeader(),
+                    const SizedBox(height: 32),
+                    _buildProfileCard(),
+                    const SizedBox(height: 20),
+                    _buildStatsCards(),
+                    const SizedBox(height: 20),
+                    _buildWelcomeCard(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackgroundElements() {
+    return Stack(
+      children: [
+        Positioned(
+          top: 80,
+          right: 40,
+          child: Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  Colors.deepPurple.withOpacity(0.15),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 100,
+          left: 40,
+          child: Container(
+            width: 250,
+            height: 250,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  Colors.orange.withOpacity(0.12),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: MediaQuery.of(context).size.height * 0.4,
+          right: MediaQuery.of(context).size.width * 0.1,
+          child: Container(
+            width: 180,
+            height: 180,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  Colors.indigo.withOpacity(0.08),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(Icons.arrow_back, color: Colors.grey[700]),
+            ),
+            Text(
+              'Back',
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontSize: 16,
+              ),
+            ),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: _logout,
+              icon: const Icon(Icons.logout, size: 18),
+              label: const Text('Logout'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red[700],
+                backgroundColor: Colors.white.withOpacity(0.5),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withOpacity(0.3),
+            border: Border.all(color: Colors.white.withOpacity(0.4)),
+          ),
+          child: Icon(
+            Icons.account_circle,
+            size: 32,
+            color: Colors.deepPurple[600],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'My Profile',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[800],
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Manage your account information',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileCard() {
+    return Card(
+      color: Colors.white.withOpacity(0.7),
+      elevation: 12,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.deepPurple.withOpacity(0.3), width: 2),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.deepPurple.withOpacity(0.1),
+              Colors.white.withOpacity(0.1),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            children: [
+              // Profile Avatar - Show Google photo if available
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.deepPurple.withOpacity(0.2),
+                      Colors.indigo.withOpacity(0.2),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.deepPurple.withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: photoURL != null
+                    ? CircleAvatar(
+                        radius: 60,
+                        backgroundImage: NetworkImage(photoURL!),
+                        backgroundColor: Colors.transparent,
+                      )
+                    : Container(
+                        padding: const EdgeInsets.all(20),
+                        child: Icon(
+                          Icons.person,
+                          size: 64,
+                          color: Colors.deepPurple[600],
                         ),
                       ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                userName,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.green.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      size: 16,
+                      color: Colors.green[700],
                     ),
-                    // Title
-                    const Text(
-                      "My Profile",
+                    const SizedBox(width: 6),
+                    Text(
+                      'Active',
                       style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    // Logout button
-                    GestureDetector(
-                      onTap: _logout,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          gradient: const LinearGradient(
-                            colors: [Colors.white24, Colors.white10],
-                          ),
-                          border: Border.all(color: Colors.white30, width: 1),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.logout,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              "Logout",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green[700],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 40),
-                
-                // Profile Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(32),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: const LinearGradient(
-                      colors: [Colors.white24, Colors.white10],
-                    ),
-                    border: Border.all(color: Colors.white30, width: 1),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      // Profile Avatar
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          gradient: const LinearGradient(
-                            colors: [Colors.white30, Colors.white30],
-                          ),
-                          border: Border.all(color: Colors.white30, width: 2),
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      
-                      // User Details
-                      _ProfileDetailItem(
-                        icon: Icons.person_outline,
-                        label: "Name",
-                        value: userName,
-                      ),
-                      const SizedBox(height: 20),
-                      
-                      _ProfileDetailItem(
-                        icon: Icons.email_outlined,
-                        label: "Email",
-                        value: userEmail,
-                      ),
-                      const SizedBox(height: 20),
-                      
-                      _ProfileDetailItem(
-                        icon: Icons.calendar_today_outlined,
-                        label: "Joined",
-                        value: joinDate,
-                      ),
-                      const SizedBox(height: 20),
-                      
-                      _ProfileDetailItem(
-                        icon: Icons.verified_user_outlined,
-                        label: "Status",
-                        value: "Active",
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                
-                // Welcome Message
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    gradient: const LinearGradient(
-                      colors: [Colors.white30, Colors.white10],
-                    ),
-                    border: Border.all(color: Colors.white30, width: 1),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Welcome to Optim!",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        "Your account has been successfully set up. Start exploring and optimizing your experience with us!",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white.withOpacity(0.8),
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-}
+  Widget _buildStatsCards() {
+    return Column(
+      children: [
+        _buildDetailCard(
+          icon: Icons.email,
+          label: 'Email Address',
+          value: userEmail,
+          color: Colors.blue,
+        ),
+        const SizedBox(height: 12),
+        _buildDetailCard(
+          icon: Icons.calendar_today,
+          label: 'Member Since',
+          value: joinDate,
+          color: Colors.orange,
+        ),
+      ],
+    );
+  }
 
-class _ProfileDetailItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _ProfileDetailItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white.withOpacity(0.1),
-        border: Border.all(color: Colors.white30, width: 1),
+  Widget _buildDetailCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required MaterialColor color,
+  }) {
+    return Card(
+      color: Colors.white.withOpacity(0.5),
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.white.withOpacity(0.4)),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.white.withOpacity(0.2),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: color[700],
+                size: 24,
+              ),
             ),
-            child: Icon(icon, color: Colors.white, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white.withOpacity(0.7),
-                    fontWeight: FontWeight.w500,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeCard() {
+    return Card(
+      color: Colors.white.withOpacity(0.5),
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.white.withOpacity(0.4)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.grey[800]),
+                const SizedBox(width: 8),
                 Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                  'Welcome to Optim!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Text(
+              'Your account has been successfully set up. Start exploring and optimizing your experience with our AI-powered ophthalmology platform!',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(Icons.lightbulb_outline, size: 16, color: Colors.amber[700]),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Tip: Explore different analysis types for comprehensive eye health insights',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

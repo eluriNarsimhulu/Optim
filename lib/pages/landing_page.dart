@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'detection_page.dart';
 import 'glaucoma_decision_page.dart';
 import 'vqa_page.dart';
+import 'about_page.dart';  // Add this import for the new About page
 import '../home_page.dart';
 
 void main() {
@@ -55,9 +56,9 @@ class LandingPage extends StatelessWidget {
                     const SizedBox(height: 60),
                     _buildHeader(),
                     const SizedBox(height: 32),
-                    _buildMainCard(context),
+                    _buildFeatureButtons(context), // Features first
                     const SizedBox(height: 24),
-                    _buildFeatureButtons(context),
+                    _buildMainCard(context), // Moved below the feature buttons
                     const SizedBox(height: 20),
                     _buildFooter(),
                   ],
@@ -202,185 +203,123 @@ class LandingPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          'AI-Powered Ophthalmology Platform',
+        const Column(
+          children: [
+            Text(
+              'Welcome to',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1F2937),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'AI-Powered Ophthalmology',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2563EB),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'Platform',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1F2937),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      const SizedBox(height: 16),
+      const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Text(
+          'Advancing eye care through intelligent image analysis and visual question answering',
           style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1F2937),
+            fontSize: 18,
+            color: Color(0xFF4B5563),
+            height: 1.5,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 16),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'Advancing eye care through intelligent image analysis and visual question answering',
-            style: TextStyle(
-              fontSize: 18,
-              color: Color(0xFF4B5563),
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
+
+
 
   Widget _buildMainCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-          width: 1,
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE0F2FE), Color(0xFFFFFFFF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 20,
             spreadRadius: 5,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
-            'About Our Platform',
+            'Learn More About Our Project',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1F2937),
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
-          _buildContentText(),
-          const SizedBox(height: 32),
-          _buildFeatureCards(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContentText() {
-    return const Column(
-      children: [
-        Text(
-          'Welcome to our comprehensive AI-powered ophthalmology platform that combines cutting-edge technology with clinical expertise to revolutionize eye care diagnosis and monitoring.',
-          style: TextStyle(
-            fontSize: 16,
-            color: Color(0xFF374151),
-            height: 1.6,
-          ),
-          textAlign: TextAlign.justify,
-        ),
-        SizedBox(height: 16),
-        Text(
-          'Our platform integrates two powerful AI-driven modules designed to assist healthcare professionals in accurate and efficient eye disease detection:',
-          style: TextStyle(
-            fontSize: 16,
-            color: Color(0xFF374151),
-            height: 1.6,
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.justify,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFeatureCards() {
-    return Column(
-      children: [
-        _buildFeatureCard(
-          icon: Icons.chat_bubble_outline,
-          iconColor: const Color(0xFF9333EA),
-          title: 'Visual Question Answering',
-          description:
-              'Interactive AI system that answers questions about ophthalmological images across multiple imaging modalities, providing instant insights and detailed analysis',
-        ),
-        const SizedBox(height: 16),
-        _buildFeatureCard(
-          icon: Icons.analytics_outlined,
-          iconColor: const Color(0xFF2563EB),
-          title: 'Glaucoma Detection & Classification',
-          description:
-              'Advanced deep learning models for precise optic disc segmentation, glaucoma classification, and visual field progression prediction from fundus images',
-        ),
-        const SizedBox(height: 24),
-        const Text(
-          'Both modules leverage state-of-the-art GenAI models to deliver accurate, reliable results that support clinical decision-making and enhance patient care outcomes.',
-          style: TextStyle(
-            fontSize: 16,
-            color: Color(0xFF374151),
-            height: 1.6,
-          ),
-          textAlign: TextAlign.justify,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFeatureCard({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String description,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            size: 40,
-            color: iconColor,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1F2937),
+          const SizedBox(height: 16),
+          const Text(
+            'Discover how our AI-driven ophthalmology solutions are transforming eye disease diagnosis, enhancing patient outcomes, and empowering clinicians worldwide.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF374151),
+              height: 1.6,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF4B5563),
-              height: 1.5,
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutPage()),
+              );
+            },
+            icon: const Icon(Icons.info_outline),
+            label: const Text('About Us'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2563EB),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 5,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
+
 
   Widget _buildFeatureButtons(BuildContext context) {
     return Column(
@@ -397,8 +336,8 @@ class LandingPage extends StatelessWidget {
         const SizedBox(height: 20),
         _buildNavigationButton(
           context: context,
-          icon: Icons.question_answer,
-          title: 'VQA Ophthalmology',
+          icon: Icons.chat_bubble_outline,
+          title: 'Visual Chatbot',
           description: 'Ask questions about eye images',
           gradientColors: [
             const Color(0xFF9333EA),
@@ -410,25 +349,12 @@ class LandingPage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => VQAPage()),
             );
           },
-          // onTap: () {
-          //   // TODO: Navigate to VQA page
-          //   // Navigator.push(
-          //   //   context,
-          //   //   MaterialPageRoute(builder: (context) => VQAPage()),
-          //   // );
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     const SnackBar(
-          //       content: Text('VQA feature coming soon!'),
-          //       backgroundColor: Color(0xFF9333EA),
-          //     ),
-          //   );
-          // },
         ),
         const SizedBox(height: 16),
         _buildNavigationButton(
           context: context,
           icon: Icons.visibility,
-          title: 'Glaucoma Detection',
+          title: 'Glaucoma Analysis on Fundus Image',
           description: 'Classify and segment fundus images',
           gradientColors: [
             const Color(0xFF2563EB),
@@ -439,6 +365,27 @@ class LandingPage extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (context) => GlaucomaDecisionPage()),
             );
+          },
+        ),
+        const SizedBox(height: 16),
+        _buildNavigationButton(
+          context: context,
+          icon: Icons.medical_information,
+          title: 'EHR - Patient Details',
+          description: 'Electronic Health Records Management',
+          gradientColors: [
+            const Color(0xFFEA580C),
+            const Color(0xFFDC2626),
+          ],
+          onTap: () {
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   const SnackBar(
+            //     content: Text('EHR feature coming soon!'),
+            //     backgroundColor: Color(0xFFEA580C),
+            //     duration: Duration(seconds: 2),
+            //   ),
+            // );
+            Navigator.pushNamed(context, '/ehr');
           },
         ),
       ],
