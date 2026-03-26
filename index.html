@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optim - AI-Powered Ophthalmology Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .team-card {
+            transition: all 0.3s ease;
+        }
+        
+        .team-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body class="scroll-smooth">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white shadow-lg">
+        <div class="container mx-auto px-4 sm:px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                        <i class="fas fa-eye text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Optim</span>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="text-gray-700 hover:text-purple-600 transition">Home</a>
+                    <a href="#about" class="text-gray-700 hover:text-purple-600 transition">About</a>
+                    <a href="#features" class="text-gray-700 hover:text-purple-600 transition">Features</a>
+                    <a href="#download" class="text-gray-700 hover:text-purple-600 transition">Download</a>
+                    <a href="#team" class="text-gray-700 hover:text-purple-600 transition">Team</a>
+                </div>
+                
+                <a href="#download" class="gradient-bg text-white px-6 py-2 rounded-full hover:opacity-90 transition">
+                    Download App
+                </a>
+                
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-700">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 space-y-3">
+                <a href="#home" class="block text-gray-700 hover:text-purple-600 transition">Home</a>
+                <a href="#about" class="block text-gray-700 hover:text-purple-600 transition">About</a>
+                <a href="#features" class="block text-gray-700 hover:text-purple-600 transition">Features</a>
+                <a href="#download" class="block text-gray-700 hover:text-purple-600 transition">Download</a>
+                <a href="#team" class="block text-gray-700 hover:text-purple-600 transition">Team</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="pt-24 pb-20 gradient-bg">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+                <div class="lg:w-1/2 text-white mb-12 lg:mb-0">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                        AI-Powered <br/>Ophthalmology <br/>Platform
+                    </h1>
+                    <p class="text-lg sm:text-xl mb-8 text-white/90">
+                        Revolutionizing eye care through advanced artificial intelligence. Detect glaucoma, analyze fundus images, and get instant medical insights.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#download" class="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition text-center">
+                            <i class="fas fa-download mr-2"></i>Download Now
+                        </a>
+                        <a href="#features" class="glass-effect text-white px-8 py-4 rounded-full font-semibold hover:bg-white/20 transition text-center">
+                            Learn More
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- <div class="lg:w-1/2 flex justify-center">
+                    <div class="relative animate-float">
+                        <div class="w-64 h-64 sm:w-80 sm:h-80 glass-effect rounded-3xl flex items-center justify-center">
+                            <i class="fas fa-mobile-alt text-white text-9xl"></i>
+                        </div>
+                        <div class="absolute -top-6 -right-6 w-24 h-24 bg-pink-500 rounded-full blur-2xl opacity-50"></div>
+                        <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-purple-500 rounded-full blur-2xl opacity-50"></div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    About Optim
+                </h2>
+                <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+                    A cutting-edge AI platform designed to transform the landscape of eye care diagnosis and monitoring
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">What We Offer</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Visual Question Answering</h4>
+                                <p class="text-gray-600">Interactive AI system for answering questions about ophthalmological images across multiple modalities.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Glaucoma Detection Suite</h4>
+                                <p class="text-gray-600">Advanced deep learning models for optic disc segmentation, classification, and severity grading.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Electronic Health Records</h4>
+                                <p class="text-gray-600">Comprehensive patient management system for storing and retrieving medical records securely.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-2xl p-8">
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Diagnostic Accuracy</span>
+                            <span class="font-bold text-purple-600">95%+</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="gradient-bg h-3 rounded-full" style="width: 95%"></div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Time Reduction</span>
+                            <span class="font-bold text-purple-600">70%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="gradient-bg h-3 rounded-full" style="width: 70%"></div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">24/7 Availability</span>
+                            <span class="font-bold text-purple-600">100%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="gradient-bg h-3 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Key Features
+                </h2>
+                <p class="text-lg sm:text-xl text-gray-600">
+                    Comprehensive tools for advanced ophthalmological analysis
+                </p>
+            </div>
+            
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-comments text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Visual Q&A Chatbot</h3>
+                    <p class="text-gray-600 mb-4">
+                        Ask questions about eye images and receive instant AI-powered insights across multiple imaging modalities.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Fundus Photography</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>OCT Scans</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Slit-lamp Images</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-microscope text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Binary Classification</h3>
+                    <p class="text-gray-600 mb-4">
+                        Accurate glaucoma detection with binary classification between healthy and glaucomatous eyes.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>High Accuracy Detection</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Probability Distribution</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Quick Results</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-layer-group text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Image Segmentation</h3>
+                    <p class="text-gray-600 mb-4">
+                        Precise optic disc and cup segmentation for accurate cup-to-disc ratio (CDR) calculation.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Optic Disc Boundary</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Optic Cup Detection</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>CDR Analysis</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-star text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Advanced Classification</h3>
+                    <p class="text-gray-600 mb-4">
+                        Multi-class severity assessment distinguishing between normal, early, and advanced glaucoma.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Severity Grading</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Risk Assessment</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Detailed Probabilities</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-folder-open text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Electronic Health Records</h3>
+                    <p class="text-gray-600 mb-4">
+                        Comprehensive patient data management with secure storage and easy retrieval.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Patient History</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Examination Records</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Diagnostic Reports</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Secure Authentication</h3>
+                    <p class="text-gray-600 mb-4">
+                        Multi-factor authentication with email and phone verification for maximum security.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Email Verification</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Phone OTP</li>
+                        <li class="flex items-center"><i class="fas fa-circle text-purple-600 text-xs mr-2"></i>Google Sign-In</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="py-20 gradient-bg">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
+                Download Optim Now
+            </h2>
+            <p class="text-lg sm:text-xl text-white/90 mb-12 max-w-2xl mx-auto">
+                Get started with AI-powered ophthalmology analysis. Download our app and experience the future of eye care.
+            </p>
+            
+            <div class="glass-effect rounded-2xl p-8 sm:p-12 max-w-3xl mx-auto">
+                <div class="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-8 mb-8">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-white mb-2">50 MB</div>
+                        <div class="text-white/80">App Size</div>
+                    </div>
+                    <div class="hidden sm:block w-px h-16 bg-white/30"></div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-white mb-2">Android</div>
+                        <div class="text-white/80">Platform</div>
+                    </div>
+                    <div class="hidden sm:block w-px h-16 bg-white/30"></div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-white mb-2">Latest</div>
+                        <div class="text-white/80">Version</div>
+                    </div>
+                </div>
+                
+                <a href="optim_release.apk" download class="inline-flex items-center bg-white text-purple-600 px-10 py-5 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-xl">
+                    <i class="fas fa-download mr-3 text-xl"></i>
+                    Download APK (50 MB)
+                </a>
+                
+                <p class="text-white/70 text-sm mt-6">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    For Android devices only. Make sure to enable "Install from Unknown Sources" in your settings.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Meet Our Team
+                </h2>
+                <p class="text-lg sm:text-xl text-gray-600">
+                    GenAI Ophthalmology Team (G-489)
+                </p>
+            </div>
+            
+            <!-- Mentor -->
+            <div class="max-w-md mx-auto mb-16">
+                <div class="team-card bg-white rounded-2xl shadow-xl p-8 text-center">
+                    <div class="relative inline-block mb-6">
+                        <img src="https://media.licdn.com/dms/image/v2/D5603AQF1SOAbs3yZ0w/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1724602582662?e=1764806400&v=beta&t=EGnJetaVJE9xX8cryqx-8ArelICpre4YXyCyF9_wVI8" 
+                             alt="Dr. Devika Rubi" 
+                             class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-purple-200">
+                        <div class="absolute -bottom-2 -right-2 w-12 h-12 gradient-bg rounded-full flex items-center justify-center border-4 border-white">
+                            <i class="fas fa-award text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Dr. Devika Rubi</h3>
+                    <p class="text-purple-600 font-semibold mb-4">Project Mentor</p>
+                    <a href="https://www.linkedin.com/in/devikarubi/" target="_blank" 
+                       class="inline-flex items-center text-gray-600 hover:text-purple-600 transition">
+                        <i class="fab fa-linkedin text-2xl mr-2"></i>
+                        <span>Connect on LinkedIn</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Team Members -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 lg:gap-8">
+                <!-- Member 1 -->
+                <div class="team-card bg-white rounded-2xl shadow-lg p-6 text-center">
+                    <img src="https://res.cloudinary.com/dxhr35o8l/image/upload/v1763021259/profile_pic_tftmmz.png" 
+                         alt="E. Narsimhulu" 
+                         class="w-24 h-24 rounded-full object-cover mx-auto mb-4 border-4 border-purple-100">
+                    <h3 class="text-lg font-bold mb-1">E. Narsimhulu</h3>
+                    <p class="text-sm text-gray-600 mb-4">Team Member</p>
+                    <a href="https://www.linkedin.com/in/narsimhulu-eluri-293b6a24a/" target="_blank" 
+                       class="inline-block text-purple-600 hover:text-purple-700 transition">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                </div>
+                
+                <!-- Member 2 -->
+                <div class="team-card bg-white rounded-2xl shadow-lg p-6 text-center">
+                    <img src="https://res.cloudinary.com/dxhr35o8l/image/upload/v1763021259/profile_pic_tftmmz.png" 
+                         alt="K. Srinidhi" 
+                         class="w-24 h-24 rounded-full object-cover mx-auto mb-4 border-4 border-purple-100">
+                    <h3 class="text-lg font-bold mb-1">K. Srinidhi</h3>
+                    <p class="text-sm text-gray-600 mb-4">Team Member</p>
+                    <a href="https://www.linkedin.com/in/srinidhi-kasetty-9440582b8/" target="_blank" 
+                       class="inline-block text-purple-600 hover:text-purple-700 transition">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                </div>
+                
+                <!-- Member 3 -->
+                <div class="team-card bg-white rounded-2xl shadow-lg p-6 text-center">
+                    <img src="https://res.cloudinary.com/dxhr35o8l/image/upload/v1763021259/profile_pic_tftmmz.png" 
+                         alt="A. Ramya" 
+                         class="w-24 h-24 rounded-full object-cover mx-auto mb-4 border-4 border-purple-100">
+                    <h3 class="text-lg font-bold mb-1">A. Ramya</h3>
+                    <p class="text-sm text-gray-600 mb-4">Team Member</p>
+                    <a href="https://www.linkedin.com/in/allu-ramya-3691902b8/" target="_blank" 
+                       class="inline-block text-purple-600 hover:text-purple-700 transition">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                </div>
+                
+                <!-- Member 4 -->
+                <div class="team-card bg-white rounded-2xl shadow-lg p-6 text-center">
+                    <img src="https://res.cloudinary.com/dxhr35o8l/image/upload/v1763021259/profile_pic_tftmmz.png" 
+                         alt="J. Adarsh" 
+                         class="w-24 h-24 rounded-full object-cover mx-auto mb-4 border-4 border-purple-100">
+                    <h3 class="text-lg font-bold mb-1">J. Adarsh</h3>
+                    <p class="text-sm text-gray-600 mb-4">Team Member</p>
+                    <a href="https://www.linkedin.com/in/adarsh-j-a44612293/" target="_blank" 
+                       class="inline-block text-purple-600 hover:text-purple-700 transition">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                </div>
+                
+                <!-- Member 5 -->
+                <div class="team-card bg-white rounded-2xl shadow-lg p-6 text-center">
+                    <img src="https://res.cloudinary.com/dxhr35o8l/image/upload/v1763021259/profile_pic_tftmmz.png" 
+                         alt="P. Charanjeeth Shasta" 
+                         class="w-24 h-24 rounded-full object-cover mx-auto mb-4 border-4 border-purple-100">
+                    <h3 class="text-lg font-bold mb-1">P. Charanjeeth</h3>
+                    <p class="text-sm text-gray-600 mb-4">Team Member</p>
+                    <a href="https://www.linkedin.com/in/charanjeeth-shasta-pendam-45a1a72b5/" target="_blank" 
+                       class="inline-block text-purple-600 hover:text-purple-700 transition">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                            <i class="fas fa-eye text-white"></i>
+                        </div>
+                        <span class="text-2xl font-bold">Optim</span>
+                    </div>
+                    <p class="text-gray-400">
+                        AI-Powered Ophthalmology Platform for advanced eye care diagnosis and monitoring.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition">About</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition">Features</a></li>
+                        <li><a href="#download" class="text-gray-400 hover:text-white transition">Download</a></li>
+                        <li><a href="#team" class="text-gray-400 hover:text-white transition">Team</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Important Notice</h3>
+                    <p class="text-gray-400 text-sm">
+                        This platform is designed for educational and research purposes. Results should not replace professional medical diagnosis.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 text-center">
+                <p class="text-gray-400">
+                    &copy; 2025 Optim - GenAI Ophthalmology Team (G-489). All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scroll-top" class="fixed bottom-8 right-8 w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 hover:scale-110">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking a link
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Scroll to top button
+        const scrollTopBtn = document.getElementById('scroll-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                scrollTopBtn.classList.add('opacity-0', 'pointer-events-none');
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all feature cards and team cards
+        document.querySelectorAll('.feature-card, .team-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

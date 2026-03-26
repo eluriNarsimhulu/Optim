@@ -147,6 +147,7 @@ out/
 .vitepress/dist
 .vitepress/cache
 models/
+ios/Runner/
 # Logs
 logs
 *.log
